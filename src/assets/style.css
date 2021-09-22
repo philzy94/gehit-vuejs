@@ -1,0 +1,88 @@
+/* ./src/index.css */
+
+/*! @import */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+.body-bg{
+    background-color: rgb(255, 255, 255);
+}
+
+.reg-log {
+    @apply inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500
+    }
+
+.errors {
+    @apply text-xs text-red-600
+    } 
+
+.head-hover-md:hover{    
+    background-color: #c798ca;
+    color: white;
+    
+}
+
+.text-purple-head-color{
+    color: #c798ca;
+    
+    
+}
+
+.router-link-active{
+
+    background-color: #c798ca;
+    color: white;
+    
+}
+
+
+.cursordisable{
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+.shadow-custom { 
+    box-shadow: 0px 5px 9px 2px rgba(0, 0, 0, 0.1), 2px 2px 2px 2px rgba(0, 0, 0, 0.06); 
+}
+
+
+.input-field{
+    @apply block w-full py-2 px-3 border bg-white rounded-none rounded-r-md shadow-sm focus:outline-none focus:ring-indigo-500 border-yellow-600 sm:text-sm text-gray-500
+    }
+
+.textarea-field{
+     @apply block w-full py-2 px-3 border bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 border-yellow-600 sm:text-sm text-gray-500
+    }
+
+.input-icon{
+     @apply inline-flex items-center  px-3 rounded-l-md border border-r-0 border-yellow-600 bg-gray-50 text-gray-500 text-sm
+    }
+
+@screen md {
+
+    .head-hover-md:hover{    
+        background-color: white;
+        color: #c798ca;
+        border-bottom: solid 0.5px#c798ca;
+        
+    }
+
+    .text-purple-head-color{
+        color: #c798ca;
+        
+        
+    }
+
+    .router-link-active{
+        
+        background-color: white;
+        border-bottom: solid 0.5px#c798ca;
+        
+    }
+
+}
+
+
