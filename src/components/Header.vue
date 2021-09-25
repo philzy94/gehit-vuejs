@@ -334,7 +334,7 @@
             <button class="text-black close-modal" @click="closeModal">&cross;</button>
           </div>
           <div class="text-sm text-center">
-            <span class="errors">*</span> means the field must be field
+            <span class="errors">*</span> means the field must be fill
           </div>
           <!-- modal body -->
           <div class="p-3">
