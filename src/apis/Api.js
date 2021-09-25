@@ -1,7 +1,7 @@
 import axios from "axios";
 
 let BaseApi = axios.create({
-  baseURL: process.env.VUE_API_BASE_URL
+  baseURL: process.env.VUE_APP_API_BASE_URL
 });
 
 let Api = function() {
