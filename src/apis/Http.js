@@ -86,4 +86,25 @@ export default {
     return Api().post("/profile/update", form);
   },
 
+
+    //location
+    getLocations(stateId) {
+      return Api().get("/location/"+ stateId);
+    },
+    saveLocation(form) {
+      return Api().post("/location/save", form);
+    },
+  
+    updateLocation(form, id) {
+      return Api().put("/location/update/"+ id, form);
+    },
+
+    deleteLocation(id) {
+      return Api().delete("/location/delete/"+ id);
+    },
+
+
+
+    
+
 };

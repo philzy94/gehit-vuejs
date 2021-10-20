@@ -6,6 +6,7 @@ import PageNotFound from "./pages/404.vue";
 import OrganizationDetail from "./pages/Organizationdetail.vue";
 import verifyEmail from "./pages/verifyEmail.vue";
 import Gallery from "./pages/Gallery.vue";
+import location from "./pages/location.vue";
 import store from './store.js';
 
 
@@ -54,6 +55,12 @@ const routes = [
     name: "authGallery",
     component: Gallery,
     meta: { authOnly: true },
+  },
+
+  {
+    path: "/admin/location",
+    name: "location",
+    component: location,
   },
 
 
