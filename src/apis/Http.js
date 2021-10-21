@@ -103,6 +103,22 @@ export default {
       return Api().delete("/location/delete/"+ id);
     },
 
+    // sub-category
+    getSubCategories(categoryId) {
+      return Api().get("/subcategory/"+ categoryId);
+    },
+    saveSubCategory(form) {
+      return Api().post("/subcategory/save", form);
+    },
+  
+    updateSubCategory(form, id) {
+      return Api().put("/subcategory/update/"+ id, form);
+    },
+
+    deleteSubCategory(id) {
+      return Api().delete("/subcategory/delete/"+ id);
+    },
+
 
 
     

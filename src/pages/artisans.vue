@@ -34,7 +34,7 @@
           <div>
             <div class="py-2">
               <label for="category" class="block text-sm font-medium text-white">
-                Select State <span class="errors">*</span>
+                Select category <span class="errors">*</span>
               </label>
 
               <div class="mt-1 flex rounded-md shadow-sm">
@@ -56,25 +56,29 @@
                 </span>
 
                 <select
-                  v-model="selectedStateId"
-                  @change="getLocations(this.selectedStateId)"
-                  name="state"
+                  v-model="selectedCateoryId"
+                  @change="getSubCategories(this.selectedCateoryId)"
+                  name="Category"
                   class="input-field"
                 >
-                  <option value="" disabled>---Select State---</option>
-                  <option v-for="state in States" :key="state.id" :value="state.id">
-                    {{ state.state }}
+                  <option value="" disabled>---Select Category---</option>
+                  <option
+                    v-for="category in Categories"
+                    :key="category.id"
+                    :value="category.id"
+                  >
+                    {{ category.skill_category }}
                   </option>
                 </select>
               </div>
-              <span class="errors bg-white" v-if="errors.state_id">
-                {{ errors.state_id[0] }}
+              <span class="errors bg-white" v-if="errors.category">
+                {{ errors.category[0] }}
               </span>
             </div>
 
             <div class="py-2">
-              <label for="location" class="block text-sm font-medium text-white">
-                Add Location <span class="errors">*</span>
+              <label for="subCategory" class="block text-sm font-medium text-white">
+                Add Sub-Category <span class="errors">*</span>
               </label>
               <div class="mt-1 flex rounded-md shadow-sm">
                 <span class="input-icon">
@@ -94,22 +98,22 @@
                   </svg>
                 </span>
                 <input
-                  v-model="NewLocationForm.location"
+                  v-model="NewSubCategoryForm.sub_category"
                   type="text"
-                  name="location"
-                  id="location"
+                  name="sub_category"
+                  id="sub_category"
                   class="block w-full py-2 px-3 border bg-white rounded-none shadow-sm focus:outline-none focus:ring-indigo-500 border-yellow-600 sm:text-sm text-gray-500"
-                  placeholder="Location"
+                  placeholder="SubCategory"
                 />
                 <button
                   class="items-center px-5 rounded-r-md border border-white bg-yellow-600 text-white text-md"
-                  @click="addlocation"
+                  @click="addSubCategory"
                 >
                   ADD
                 </button>
               </div>
-              <span class="errors bg-white" v-if="errors.location">
-                {{ errors.location[0] }}
+              <span class="errors bg-white" v-if="errors.sub_category">
+                {{ errors.sub_category[0] }}
               </span>
             </div>
           </div>
@@ -121,7 +125,7 @@
               <div class="flex flex-wrap items-center">
                 <div class="relative w-full px-4 max-w-full flex-grow flex-1">
                   <h3 class="font-semibold text-base text-blueGray-700">
-                    List of location
+                    List of Sub Categories
                   </h3>
                 </div>
               </div>
@@ -139,7 +143,7 @@
                     <th
                       class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
                     >
-                      LOCATIONS
+                      SUB CATEGORIES
                     </th>
                     <th
                       class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
@@ -155,8 +159,8 @@
                 </thead>
 
                 <tbody
-                  v-for="(location, index) in getCurrentLocations"
-                  :key="location.id"
+                  v-for="(subCategory, index) in getCurrentSubCategory"
+                  :key="subCategory.id"
                 >
                   <tr>
                     <th
@@ -167,7 +171,7 @@
                     <td
                       class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
                     >
-                      {{ location.location }}
+                      {{ subCategory.sub_category }}
                     </td>
                     <td
                       class="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
@@ -176,7 +180,7 @@
                         <button
                           class="bg-blue-800 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                           type="button"
-                          @click="editLocationModal(location)"
+                          @click="editSubCategoryModal(subCategory)"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -200,7 +204,7 @@
                     >
                       <div class="relative w-full max-w-full flex-grow flex-1">
                         <button
-                          @click="deleteLocations(location)"
+                          @click="deleteSubCategory(subCategory)"
                           class="bg-red-700 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                           type="button"
                         >
@@ -238,48 +242,48 @@ import Toast from "../apis/sweetAlert";
 import Http from "../apis/Http";
 
 export default {
-  name: "Location",
+  name: "Artisan",
   components: {},
   mounted() {
-    this.getState();
+    this.getCategory();
   },
 
   data() {
     return {
       ShowSpinner: true,
-      States: "",
-      selectedStateId: "",
-      selectedStateLocations: "",
+      Categories: "",
+      selectedCateoryId: "",
+      selectedCategorySubCategories: "",
       errors: [],
 
-      NewLocationForm: {
-        location: "",
-        state_id: "",
+      NewSubCategoryForm: {
+        sub_category: "",
+        category: "",
       },
 
-      UpdateLocation: {
-        location: "",
+      editSubCategoryForm: {
+        sub_category: "",
       },
     };
   },
   computed: {
-    getCurrentLocations() {
-      return this.selectedStateLocations;
+    getCurrentSubCategory() {
+      return this.selectedCategorySubCategories;
     },
   },
 
   methods: {
-    addlocation() {
+    addSubCategory() {
       this.$store.commit("loadSpinner", true);
-      Http.saveLocation(this.NewLocationForm)
+      Http.saveSubCategory(this.NewSubCategoryForm)
         .then(() => {
           this.$store.commit("loadSpinner", false);
-          this.NewLocationForm.location = "";
+          this.NewSubCategoryForm.sub_category = "";
           this.errors = [];
-          this.getLocations(this.selectedStateId);
+          this.getSubCategories(this.selectedCateoryId);
           Toast.fire({
             icon: "success",
-            title: "Location added Successfully",
+            title: "SubCategory added Successfully",
           });
         })
         .catch((error) => {
@@ -290,17 +294,19 @@ export default {
             Swal.fire({
               icon: "error",
               title: "Oops...",
-              text: "Something went wrong! Fail to add location.",
+              text: "Something went wrong! Fail to add subCategory.",
               footer: "",
             });
           }
         });
     },
-    getState() {
+    getCategory() {
       this.$store.commit("loadSpinner", true);
-      Http.getState()
+
+      Http.getCategory()
+
         .then((response) => {
-          this.States = response.data;
+          this.Categories = response.data;
 
           this.$store.commit("loadSpinner", false);
         })
@@ -310,59 +316,63 @@ export default {
             icon: "error",
             title: "Oops...",
             text:
-              "An error occured while trying to get the total states from the database... Please refresh this page.",
+              "An error occured while trying to get the total Categories from the database... Please refresh this page.",
             footer: "",
           });
         });
     },
-    getLocations(stateId) {
+    getSubCategories(categoryId) {
       this.$store.commit("loadSpinner", true);
-      this.NewLocationForm.location = "";
-      this.NewLocationForm.state_id = this.selectedStateId;
-      Http.getLocations(stateId)
+      this.NewSubCategoryForm.sub_category = "";
+      this.NewSubCategoryForm.category = this.selectedCateoryId;
+
+      Http.getSubCategories(categoryId)
         .then((response) => {
           this.$store.commit("loadSpinner", false);
-          this.selectedStateLocations = response.data;
+          this.selectedCategorySubCategories = response.data;
         })
         .catch(() => {
+          //console.log(error.response);
           this.$store.commit("loadSpinner", false);
           Swal.fire({
             icon: "error",
             title: "Oops...",
             text:
-              "An error Occured while trying to get location or location does not exist",
+              "An error Occured while trying to get subCategory or subCategory does not exist",
             footer: "",
           });
         });
     },
-    editLocationModal(editLocation) {
+
+    editSubCategoryModal(editsubCategory) {
       Swal.fire({
-        title: "Edit Location",
+        title: "Edit Sub Category",
         input: "text",
-        inputValue: editLocation.location,
+        inputValue: editsubCategory.sub_category,
         inputAttributes: {
           autocapitalize: "off",
         },
         showCancelButton: "true",
         confirmButtonText: "Update",
         showLoaderOnConfirm: true,
-        preConfirm: (location) => {
+        preConfirm: (subCategory) => {
           this.$store.commit("loadSpinner", true);
-          this.UpdateLocation.location = location;
+          this.editSubCategoryForm.sub_category = subCategory;
 
-          this.editLocations(this.UpdateLocation, editLocation);
+          this.editSubCategories(this.editSubCategoryForm, editsubCategory);
         },
       });
     },
-    editLocations(form, editLocation) {
-      Http.updateLocation(form, editLocation.id)
+    editSubCategories(form, editsubCategory) {
+      Http.updateSubCategory(form, editsubCategory.id)
         .then(() => {
           this.$store.commit("loadSpinner", false);
-          this.selectedStateLocations[
-            this.selectedStateLocations.indexOf(editLocation)
-          ].location = this.UpdateLocation.location;
 
-          this.UpdateLocation.location = "";
+          this.selectedCategorySubCategories[
+            this.selectedCategorySubCategories.indexOf(editsubCategory)
+          ].sub_category = this.editSubCategoryForm.sub_category;
+
+          this.editSubCategoryForm.sub_category = "";
 
           Toast.fire({
             icon: "success",
@@ -376,13 +386,13 @@ export default {
             icon: "error",
             title: "Oops...",
             text:
-              "An error occured while trying to edit location. It's either the location you are trying to update to already exist or there is a serve error. Try again.",
+              "An error occured while trying to edit subCategory. It's either the subCategory you are trying to update to already exist or there is a serve error. Try again.",
             footer: "",
           });
         });
     },
 
-    deleteLocations(location) {
+    deleteSubCategory(subCategory) {
       Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
@@ -395,13 +405,13 @@ export default {
         if (result.isConfirmed) {
           this.$store.commit("loadSpinner", true);
 
-          Http.deleteLocation(location.id)
+          Http.deleteSubCategory(subCategory.id)
             .then(() => {
               this.$store.commit("loadSpinner", false);
-              this.selectedStateLocations = this.selectedStateLocations.filter(
-                (item) => item !== location
+              this.selectedCategorySubCategories = this.selectedCategorySubCategories.filter(
+                (item) => item !== subCategory
               );
-              Swal.fire("Deleted!", "Location has been deleted.", "success");
+              Swal.fire("Deleted!", "SubCategory has been deleted.", "success");
             })
             .catch(() => {
               this.$store.commit("loadSpinner", false);
@@ -410,7 +420,7 @@ export default {
                 icon: "error",
                 title: "Oops...",
                 text:
-                  "Something went wrong! location not deleted. Either of the following can be the reason. There is an error reaching the serve, or you are trying to delete a location that has already been use (You have to delete every artisan that is using the location before u can delete the location)",
+                  "Something went wrong! subCategory not deleted. Either of the following can be the reason. There is an error reaching the serve, or you are trying to delete a subCategory that has already been use (You have to delete every artisan that is using the subCategory before u can delete the subCategory)",
                 footer: "",
               });
             });

@@ -7,6 +7,7 @@ import OrganizationDetail from "./pages/Organizationdetail.vue";
 import verifyEmail from "./pages/verifyEmail.vue";
 import Gallery from "./pages/Gallery.vue";
 import location from "./pages/location.vue";
+import artisan from "./pages/artisans.vue";
 import store from './store.js';
 
 
@@ -61,6 +62,12 @@ const routes = [
     path: "/admin/location",
     name: "location",
     component: location,
+  },
+
+  {
+    path: "/admin/Category_subcategory",
+    name: "artisan",
+    component: artisan,
   },
 
 
