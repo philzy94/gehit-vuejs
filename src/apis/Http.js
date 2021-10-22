@@ -37,6 +37,20 @@ export default {
   getCategory() {
     return Api().get("/category");
   },
+  
+  saveCategory(form) {
+    return Api().post("/category/save", form);
+  },
+
+  updateCategory(form, id) {
+    return Api().put("/category/update/"+ id, form);
+  },
+
+  deleteCategory(id) {
+    return Api().delete("/category/delete/"+ id);
+  },
+
+
 
   //state
   getState() {

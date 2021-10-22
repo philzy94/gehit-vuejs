@@ -33,9 +33,32 @@
         <div class="w-full xl:w-8/12 mb-12 xl:mb-0 px-4 mx-auto mt-4">
           <div>
             <div class="py-2">
-              <label for="category" class="block text-sm font-medium text-white">
-                Select category <span class="errors">*</span>
-              </label>
+              <div class="justify-between flex">
+                <label for="category" class="block text-sm font-medium text-white">
+                  Select category <span class="errors">*</span>
+                </label>
+
+                <button
+                  class="items-center flex font-bold px-2 rounded-md border border-white bg-yellow-600 text-white text-md"
+                  @click="addCategory"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
+                  </svg>
+                  Add Category
+                </button>
+              </div>
 
               <div class="mt-1 flex rounded-md shadow-sm">
                 <span class="input-icon">
@@ -59,7 +82,7 @@
                   v-model="selectedCateoryId"
                   @change="getSubCategories(this.selectedCateoryId)"
                   name="Category"
-                  class="input-field"
+                  class="block w-full py-2 px-3 border bg-white rounded-none shadow-sm focus:outline-none focus:ring-indigo-500 border-yellow-600 sm:text-sm text-gray-500"
                 >
                   <option value="" disabled>---Select Category---</option>
                   <option
@@ -70,6 +93,45 @@
                     {{ category.skill_category }}
                   </option>
                 </select>
+
+                <button
+                  class="items-center px-4 border border-white bg-blue-800 text-white text-md"
+                  @click="updateCategory"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                </button>
+                <button
+                  class="items-center px-4 rounded-r-md border border-white bg-red-700 text-white text-md"
+                  @click="deleteCategory"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                </button>
               </div>
               <span class="errors bg-white" v-if="errors.category">
                 {{ errors.category[0] }}
@@ -254,14 +316,23 @@ export default {
       Categories: "",
       selectedCateoryId: "",
       selectedCategorySubCategories: "",
+      filterCategory: null,
       errors: [],
+
+      NewCategory: {
+        skill_category: "",
+      },
+
+      EditedCategory: {
+        skill_category: "",
+      },
 
       NewSubCategoryForm: {
         sub_category: "",
         category: "",
       },
 
-      editSubCategoryForm: {
+      EditedSubCategoryForm: {
         sub_category: "",
       },
     };
@@ -270,9 +341,170 @@ export default {
     getCurrentSubCategory() {
       return this.selectedCategorySubCategories;
     },
+
+    categoryFiltering() {
+      return this.Categories.filter(
+        (Category) => Category.id == this.selectedCateoryId
+      )[0];
+    },
   },
 
   methods: {
+    addCategory() {
+      Swal.fire({
+        title: "Add New Category",
+        input: "text",
+        inputAttributes: {
+          autocapitalize: "off",
+        },
+        showCancelButton: true,
+        confirmButtonText: "ADD",
+        showLoaderOnConfirm: true,
+        preConfirm: (category) => {
+          if (category) {
+            this.$store.commit("loadSpinner", true);
+            this.NewCategory.skill_category = category;
+            return Http.saveCategory(this.NewCategory)
+              .then(() => {
+                this.$store.commit("loadSpinner", false);
+                this.NewSubCategoryForm.sub_category = "";
+                this.NewCategory.skill_category = "";
+                this.errors = [];
+                this.getCategory();
+              })
+              .catch((error) => {
+                this.$store.commit("loadSpinner", false);
+
+                if (error.response.status === 422) {
+                  Swal.showValidationMessage(
+                    `Request failed: ${error.response.data.errors.skill_category[0]}`
+                  );
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong! Fail to add Category. Please try again",
+                    footer: "",
+                  });
+                }
+              });
+          } else {
+            Swal.showValidationMessage(`Request failed: Categorty field is required`);
+          }
+        },
+      });
+    },
+
+    updateCategory() {
+      if (this.selectedCateoryId != null && this.selectedCateoryId != "") {
+        this.filterCategory = this.categoryFiltering.skill_category;
+
+        Swal.fire({
+          title: "Update Category",
+          input: "text",
+          inputValue: this.filterCategory,
+          inputAttributes: {
+            autocapitalize: "off",
+          },
+          showCancelButton: true,
+          confirmButtonText: "Update",
+          showLoaderOnConfirm: true,
+          preConfirm: (editedcategory) => {
+            if (editedcategory) {
+              this.$store.commit("loadSpinner", true);
+              this.EditedCategory.skill_category = editedcategory;
+              return Http.updateCategory(this.EditedCategory, this.selectedCateoryId)
+                .then(() => {
+                  Toast.fire({
+                    icon: "success",
+                    title: "Category updated Successfully",
+                  });
+                  this.$store.commit("loadSpinner", false);
+                  this.NewSubCategoryForm.sub_category = "";
+                  this.EditedCategory.skill_category = "";
+                  this.errors = [];
+                  this.getCategory();
+                })
+                .catch((error) => {
+                  this.$store.commit("loadSpinner", false);
+                  console.log(error.response.data);
+
+                  if (error.response.status === 422) {
+                    Swal.showValidationMessage(
+                      `Request failed: ${error.response.data.errors.skill_category[0]}`
+                    );
+                  } else {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Oops...",
+                      text:
+                        "Something went wrong! Fail to add Category. Please try again",
+                      footer: "",
+                    });
+                  }
+                });
+            } else {
+              Swal.showValidationMessage(`Request failed: Categorty field is required`);
+            }
+          },
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Please select the category you want to delete before you can proceed",
+          footer: "",
+        });
+      }
+    },
+
+    deleteCategory() {
+      if (this.selectedCateoryId == "" || this.selectedCateoryId == null) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Please select the category you want to delete before you can proceed",
+          footer: "",
+        });
+      } else {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.$store.commit("loadSpinner", true);
+
+            return Http.deleteCategory(this.selectedCateoryId)
+              .then(() => {
+                this.$store.commit("loadSpinner", false);
+                this.Categories = this.Categories.filter(
+                  (item) => item !== this.categoryFiltering
+                );
+                console.log(this.selectedCateoryId);
+                this.selectedCateoryId = "";
+                Swal.fire("Deleted!", "Category has been deleted.", "success");
+              })
+              .catch(() => {
+                this.$store.commit("loadSpinner", false);
+                //console.log(error.response);
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text:
+                    "Something went wrong! subCategory not deleted. Either of the following can be the reason. There is an error while trying to reaching the serve, or you are trying to delete a Category that already sub categories (You have to delete all the sub categories before delecting the Category)",
+                  footer: "",
+                });
+              });
+          }
+        });
+      }
+    },
+
     addSubCategory() {
       this.$store.commit("loadSpinner", true);
       Http.saveSubCategory(this.NewSubCategoryForm)
@@ -357,9 +589,9 @@ export default {
         showLoaderOnConfirm: true,
         preConfirm: (subCategory) => {
           this.$store.commit("loadSpinner", true);
-          this.editSubCategoryForm.sub_category = subCategory;
+          this.EditedSubCategoryForm.sub_category = subCategory;
 
-          this.editSubCategories(this.editSubCategoryForm, editsubCategory);
+          this.editSubCategories(this.EditedSubCategoryForm, editsubCategory);
         },
       });
     },
@@ -370,9 +602,9 @@ export default {
 
           this.selectedCategorySubCategories[
             this.selectedCategorySubCategories.indexOf(editsubCategory)
-          ].sub_category = this.editSubCategoryForm.sub_category;
+          ].sub_category = this.EditedSubCategoryForm.sub_category;
 
-          this.editSubCategoryForm.sub_category = "";
+          this.EditedSubCategoryForm.sub_category = "";
 
           Toast.fire({
             icon: "success",
